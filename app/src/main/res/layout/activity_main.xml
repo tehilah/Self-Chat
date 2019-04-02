@@ -10,7 +10,8 @@
     <EditText
         android:id="@+id/editText"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
+        android:maxLines="5"
+        android:minHeight="35dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="4dp"
@@ -18,8 +19,9 @@
         android:layout_marginBottom="10dp"
         android:layout_toStartOf="@+id/btn"
         android:background="@drawable/round_corners"
-        android:inputType="textMultiLine"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:singleLine="false"
         tools:layout_editor_absoluteX="5dp" />
 
     <Button
