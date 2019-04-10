@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     adapter.addMessage(message);
-                    adapter.notifyDataSetChanged();
+//                    adapter.notifyDataSetChanged();
                     chatText.setText("");
                     chatText.requestFocus();
                 }

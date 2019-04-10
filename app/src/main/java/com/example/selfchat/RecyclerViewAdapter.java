@@ -24,6 +24,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     public void addMessage(String message){
         this.messageList.add(message);
+        notifyDataSetChanged();
     }
 
     @NonNull
