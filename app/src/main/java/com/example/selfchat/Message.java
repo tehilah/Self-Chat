@@ -6,10 +6,12 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "Messages")
 public class Message {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     private String message;
+
+    public Message(){}
 
     public Message(String m){
         message = m;
@@ -20,6 +22,10 @@ public class Message {
     */
     public void setId(int id) {
         this.id = id;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     /*

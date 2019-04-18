@@ -1,14 +1,14 @@
 package com.example.selfchat;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.os.Parcelable;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -24,9 +24,6 @@ public class MainActivity extends AppCompatActivity {
     */
     public static final String EMPTY_MESSAGE = "";
     public static final String ERROR_MESSAGE = "Woops! you can't send an empty message";
-    public static final String MESSAGES = "messages";
-    public static final String LIST_STATE = "listState";
-    public static final String EDIT_TEXT = "editText";
 
     /*
     variables
@@ -34,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText chatText;
     private List<Message> messages = new ArrayList<>();
     private RecyclerViewAdapter adapter;
-    private LinearLayoutManager linearLayoutManager;
-    private MessageViewModel messageViewModel;
+    private int counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         initRecyclerView();
 
-        messageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        final MessageViewModel messageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
         messageViewModel.getAllMessages().observe(this, new Observer<List<Message>>() {
             @Override
             public void onChanged(@Nullable List<Message> messages) {
@@ -70,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     adapter.addMessage(message);
-                    adapter.notifyDataSetChanged();
+                    messageViewModel.insert(new Message(message));
                     chatText.setText("");
                     chatText.requestFocus();
                 }
@@ -87,27 +83,8 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         adapter = new RecyclerViewAdapter(messages);
         recyclerView.setAdapter(adapter);
-        linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState){
-//        super.onSaveInstanceState(outState);
-//        Parcelable listState = linearLayoutManager.onSaveInstanceState();
-//        outState.putStringArrayList(MESSAGES,adapter.getMessageList());
-//        outState.putParcelable(LIST_STATE, listState);
-//        outState.putString(EDIT_TEXT, chatText.getText().toString());
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState){
-//        super.onSaveInstanceState(savedInstanceState);
-//        if(savedInstanceState != null) {
-//            Parcelable listState = savedInstanceState.getParcelable(LIST_STATE);
-//            linearLayoutManager.onRestoreInstanceState(listState);
-//            adapter.setMessageList(savedInstanceState.getStringArrayList(MESSAGES));
-//            chatText.setText(savedInstanceState.get(EDIT_TEXT).toString());
-//        }
-//    }
 }

@@ -1,6 +1,6 @@
 package com.example.selfchat;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
@@ -15,11 +15,11 @@ public interface MessageDAO {
     @Query("SELECT * FROM Messages")
     LiveData<List<Message>> getAllMessages();
 
-    @Query("SELECT message FROM messages WHERE id LIKE :i")
-    LiveData<Message> findById(int i);
+//    @Query("SELECT message FROM messages WHERE id LIKE :i")
+//    LiveData<Message> findById(int i);
 
-    @Query("SELECT message FROM messages WHERE message LIKE :m")
-    LiveData<Message> findByString(String m);
+//    @Query("SELECT message FROM messages WHERE message LIKE :m")
+//    LiveData<Message> findByString(String m);
 
     @Insert
     void insert(Message m);
