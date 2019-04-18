@@ -7,23 +7,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
-    private ArrayList<String> messageList;
+    private List<Message> messageList;
 
-    public RecyclerViewAdapter(ArrayList<String> messageList) {
+    public RecyclerViewAdapter(List<Message> messageList) {
         this.messageList = messageList;
     }
 
-    public ArrayList<String> getMessageList() {
+    public List<Message> getMessageList() {
         return messageList;
     }
-    public void setMessageList(ArrayList<String> messageList) {
-        this.messageList = messageList;
-    }
 
+    //todo: remove notify...
+    public void setMessageList(List<Message> messageList) {
+        this.messageList = messageList;
+        notifyDataSetChanged();
+    }
+//todo: remove notify...
     public void addMessage(String message){
-        this.messageList.add(message);
+        this.messageList.add(new Message(message));
         notifyDataSetChanged();
     }
 
@@ -37,7 +41,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        holder.message.setText(messageList.get(position));
+        Message currMessage = messageList.get(position);
+        holder.message.setText(currMessage.getMessage());
     }
 
     @Override

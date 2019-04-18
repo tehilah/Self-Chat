@@ -1,16 +1,21 @@
 package com.example.selfchat;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -27,9 +32,10 @@ public class MainActivity extends AppCompatActivity {
     variables
      */
     private EditText chatText;
-    private ArrayList<String> messages = new ArrayList<>();
+    private List<Message> messages = new ArrayList<>();
     private RecyclerViewAdapter adapter;
     private LinearLayoutManager linearLayoutManager;
+    private MessageViewModel messageViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +48,19 @@ public class MainActivity extends AppCompatActivity {
 
         initRecyclerView();
 
+        messageViewModel = ViewModelProviders.of(this).get(MessageViewModel.class);
+        messageViewModel.getAllMessages().observe(this, new Observer<List<Message>>() {
+            @Override
+            public void onChanged(@Nullable List<Message> messages) {
+                Log.d("onChanged", "changed");
+                adapter.setMessageList(messages);
+            }
+        });
+
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
+                Log.d("onClick", "clicked");
                 String message = chatText.getText().toString();
                 if (message.equals(EMPTY_MESSAGE)){
                     int duration = Toast.LENGTH_LONG;
@@ -54,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else{
                     adapter.addMessage(message);
-//                    adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
                     chatText.setText("");
                     chatText.requestFocus();
                 }
@@ -67,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
      * Initializes the RecyclerView
      */
     private void initRecyclerView(){
+        Log.d("onInit", "init");
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         adapter = new RecyclerViewAdapter(messages);
         recyclerView.setAdapter(adapter);
@@ -74,23 +91,23 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState){
-        super.onSaveInstanceState(outState);
-        Parcelable listState = linearLayoutManager.onSaveInstanceState();
-        outState.putStringArrayList(MESSAGES,adapter.getMessageList());
-        outState.putParcelable(LIST_STATE, listState);
-        outState.putString(EDIT_TEXT, chatText.getText().toString());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState){
-        super.onSaveInstanceState(savedInstanceState);
-        if(savedInstanceState != null) {
-            Parcelable listState = savedInstanceState.getParcelable(LIST_STATE);
-            linearLayoutManager.onRestoreInstanceState(listState);
-            adapter.setMessageList(savedInstanceState.getStringArrayList(MESSAGES));
-            chatText.setText(savedInstanceState.get(EDIT_TEXT).toString());
-        }
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState){
+//        super.onSaveInstanceState(outState);
+//        Parcelable listState = linearLayoutManager.onSaveInstanceState();
+//        outState.putStringArrayList(MESSAGES,adapter.getMessageList());
+//        outState.putParcelable(LIST_STATE, listState);
+//        outState.putString(EDIT_TEXT, chatText.getText().toString());
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState){
+//        super.onSaveInstanceState(savedInstanceState);
+//        if(savedInstanceState != null) {
+//            Parcelable listState = savedInstanceState.getParcelable(LIST_STATE);
+//            linearLayoutManager.onRestoreInstanceState(listState);
+//            adapter.setMessageList(savedInstanceState.getStringArrayList(MESSAGES));
+//            chatText.setText(savedInstanceState.get(EDIT_TEXT).toString());
+//        }
+//    }
 }
