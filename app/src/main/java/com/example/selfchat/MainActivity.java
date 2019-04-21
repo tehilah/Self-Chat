@@ -1,11 +1,13 @@
 package com.example.selfchat;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +26,9 @@ public class MainActivity extends AppCompatActivity {
     */
     public static final String EMPTY_MESSAGE = "";
     public static final String ERROR_MESSAGE = "Woops! you can't send an empty message";
+    public static final String LIST_SIZE = "ListSize";
+    public static final String CONFIRM_DELETE = "Are you sure you want to delete?";
+    final Context context = this;
 
     /*
     variables
@@ -31,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private EditText chatText;
     private List<Message> messages = new ArrayList<>();
     private RecyclerViewAdapter adapter;
-    private int counter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button send = findViewById(R.id.btn);
+
         chatText = findViewById(R.id.editText);
 
         initRecyclerView();
@@ -48,7 +53,9 @@ public class MainActivity extends AppCompatActivity {
         messageViewModel.getAllMessages().observe(this, new Observer<List<Message>>() {
             @Override
             public void onChanged(@Nullable List<Message> messages) {
-                Log.d("onChanged", "changed");
+                //todo: see what happens if i erase the setmessage
+                Log.d(LIST_SIZE,
+                        String.valueOf(messageViewModel.getAllMessages().getValue().size()));
                 adapter.setMessageList(messages);
             }
         });
@@ -67,9 +74,36 @@ public class MainActivity extends AppCompatActivity {
                 else{
                     adapter.addMessage(message);
                     messageViewModel.insert(new Message(message));
-                    chatText.setText("");
+                    chatText.setText(EMPTY_MESSAGE);
                     chatText.requestFocus();
                 }
+
+            }
+        });
+        adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                Log.d("OnClick", "message was clicked");
+                final int pos = position;
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                alertDialogBuilder
+                        .setMessage(CONFIRM_DELETE)
+                        .setCancelable(false)
+                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // if this button is clicked, delete message
+                                messageViewModel.delete(adapter.getMessageAt(pos));
+
+                            }
+                        }).setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, just close the dialog box and do nothing
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
 
             }
         });

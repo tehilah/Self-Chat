@@ -15,5 +15,8 @@
         android:layout_marginRight="12dp"
         android:textSize="20sp"
         android:layout_alignParentTop="true"
+        android:clickable="true"
+        android:focusable="true"
+        android:longClickable="true"
         />
 </RelativeLayout>
