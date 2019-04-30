@@ -17,19 +17,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         this.messageList = messageList;
     }
 
-    public List<Message> getMessageList() {
-        return messageList;
-    }
-
-    //todo: remove notify...
     public void setMessageList(List<Message> messageList) {
         this.messageList = messageList;
         notifyDataSetChanged();
     }
-//todo: remove notify...
+
     public void addMessage(String message){
         this.messageList.add(new Message(message));
-        notifyDataSetChanged();
     }
 
     @NonNull
@@ -69,21 +63,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             message = itemView.findViewById(R.id.chatResult);
-            itemView.setOnClickListener(new View.OnClickListener() {
+            message.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public void onClick(View v) {
+                public boolean onLongClick(View v) {
                     if (mListener != null){
                         int position = getAdapterPosition();
                         if (position != RecyclerView.NO_POSITION){
                             mListener.onItemClick(position);
                         }
                     }
+                    return true;
                 }
             });
         }
-
-
     }
-
-
 }

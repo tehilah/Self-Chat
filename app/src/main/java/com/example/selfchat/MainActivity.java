@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProviders;
 import android.content.Context;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,11 +35,13 @@ public class MainActivity extends AppCompatActivity {
     private EditText chatText;
     private List<Message> messages = new ArrayList<>();
     private RecyclerViewAdapter adapter;
+    private boolean appRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         Button send = findViewById(R.id.btn);
@@ -53,17 +54,19 @@ public class MainActivity extends AppCompatActivity {
         messageViewModel.getAllMessages().observe(this, new Observer<List<Message>>() {
             @Override
             public void onChanged(@Nullable List<Message> messages) {
-                //todo: see what happens if i erase the setmessage
-                Log.d(LIST_SIZE,
-                        String.valueOf(messageViewModel.getAllMessages().getValue().size()));
+                if (!appRunning) {
+                    Log.d(LIST_SIZE,
+                            String.valueOf(messageViewModel.getAllMessages().getValue().size()));
+                    appRunning = true;
+                }
                 adapter.setMessageList(messages);
             }
         });
 
+        //click listener for editText
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                Log.d("onClick", "clicked");
                 String message = chatText.getText().toString();
                 if (message.equals(EMPTY_MESSAGE)){
                     int duration = Toast.LENGTH_LONG;
@@ -75,11 +78,12 @@ public class MainActivity extends AppCompatActivity {
                     adapter.addMessage(message);
                     messageViewModel.insert(new Message(message));
                     chatText.setText(EMPTY_MESSAGE);
-                    chatText.requestFocus();
                 }
 
             }
         });
+
+        // long click listener for textViews
         adapter.setOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -104,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
-
             }
         });
     }
@@ -118,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new RecyclerViewAdapter(messages);
         recyclerView.setAdapter(adapter);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(linearLayoutManager);
     }
 

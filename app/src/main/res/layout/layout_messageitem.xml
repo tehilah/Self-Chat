@@ -18,5 +18,6 @@
         android:clickable="true"
         android:focusable="true"
         android:longClickable="true"
+        android:descendantFocusability="blocksDescendants"
         />
 </RelativeLayout>
