@@ -1,22 +1,20 @@
 package com.example.selfchat;
 
-import androidx.room.Entity;
-import androidx.room.PrimaryKey;
 
-@Entity(tableName = "Messages")
 public class Message {
 
-    @PrimaryKey(autoGenerate = true)
+    /*
+    variables
+    */
     private int id;
-
     private String message;
-
-    private String timestamp = "";
+    private String timestamp;
 
     public Message(){}
 
-    public Message(String m){
+    public Message(String m, String ts){
         message = m;
+        timestamp = ts;
     }
 
     /*
