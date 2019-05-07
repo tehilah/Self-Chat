@@ -11,6 +11,8 @@ public class Message {
 
     private String message;
 
+    private String timestamp = "";
+
     public Message(){}
 
     public Message(String m){
@@ -28,6 +30,10 @@ public class Message {
         this.message = message;
     }
 
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
     /*
     getters
      */
@@ -37,5 +43,9 @@ public class Message {
 
     public String getMessage() {
         return message;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
     }
 }
