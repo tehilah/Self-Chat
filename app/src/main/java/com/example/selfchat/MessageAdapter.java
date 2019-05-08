@@ -1,16 +1,16 @@
 package com.example.selfchat;
 
 
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
 
 public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAdapter.MessageHolder> {
     private MessageAdapter.OnItemClickListener mListener;
@@ -46,7 +46,18 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
     }
 
     public void deleteItem(int position){
-        getSnapshots().getSnapshot(position).getReference().delete();
+        new DeleteMessageAsyncTask().execute(position);
+    }
+
+    /**
+     * Asynchronous class for deleting messages
+     */
+    private class DeleteMessageAsyncTask extends AsyncTask<Integer, Void, Void> {
+        @Override
+        protected Void doInBackground(Integer... positions) {
+            getSnapshots().getSnapshot(positions[0]).getReference().delete();
+            return null;
+        }
     }
 
     public interface OnItemClickListener{
@@ -56,12 +67,14 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
     public void setOnItemClickListener(MessageAdapter.OnItemClickListener listener){
         mListener = listener;
     }
+
     public class MessageHolder extends RecyclerView.ViewHolder{
         // here we add items that appear in each view holder
         TextView message;
 
         public MessageHolder(@NonNull View itemView) {
             super(itemView);
+            itemView.setTag(this);
             message = itemView.findViewById(R.id.chatResult);
             message.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
