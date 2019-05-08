@@ -1,7 +1,6 @@
 package com.example.selfchat;
 
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
      * Create a new RecyclerView adapter that listens to a Firestore Query.  See
      * {@link FirestoreRecyclerOptions} for configuration options.
      *
-     * @param options
+     * @param options: holds the query to retrieve data from fire-store
      */
     public MessageAdapter(FirestoreRecyclerOptions<Message> options) {
         super(options);
@@ -38,6 +37,12 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
                 parent, false);
         return new MessageHolder(view);
 
+    }
+
+    @Override
+    public void onDataChanged() {
+        notifyDataSetChanged();
+        super.onDataChanged();
     }
 
     public void deleteItem(int position){
