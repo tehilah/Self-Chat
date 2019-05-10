@@ -24,13 +24,7 @@ public class Message {
         this.id = id;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
 
     /*
     getters
@@ -43,7 +37,4 @@ public class Message {
         return message;
     }
 
-    public String getTimestamp() {
-        return timestamp;
-    }
 }

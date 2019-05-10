@@ -9,19 +9,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,32 +52,6 @@ public class MainActivity extends AppCompatActivity {
         initRecyclerView();
         chatText = findViewById(R.id.editText);
 
-//        mAdapter.setOnItemClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                final RecyclerView.ViewHolder viewHolder = (RecyclerView.ViewHolder) v.getTag();
-//                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-//                alertDialogBuilder
-//                        .setMessage(CONFIRM_DELETE)
-//                        .setCancelable(false)
-//                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int id) {
-//                                mAdapter.deleteItem(viewHolder.getAdapterPosition());
-//
-//                            }
-//                        }).setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int id) {
-//                        dialog.cancel();
-//                    }
-//                });
-//
-//                AlertDialog alertDialog = alertDialogBuilder.create();
-//                alertDialog.show();
-//                return true;
-//            }
-//        });
-//    }
-
         mAdapter.setOnItemClickListener(new MessageAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(final int position) {
@@ -90,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                         .setCancelable(false)
                         .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                // if this button is clicked, delete message
+                                // if this button is clicked, delete message asychronously
                                 mAdapter.deleteItem(position);
                             }
                         }).setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -167,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
             if(activity == null || activity.isFinishing()){
                 return null;
             }
-            
+
             // get timestamp
             SimpleDateFormat s = new SimpleDateFormat("dd-MM-YYYY, hh:mm:ss");
             s.setTimeZone(TimeZone.getTimeZone("GMT+3"));
@@ -178,6 +149,10 @@ public class MainActivity extends AppCompatActivity {
                     .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                         @Override
                         public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            if(queryDocumentSnapshots.isEmpty()){
+                                Message newMessage = new Message(messages[0], timestamp);
+                                FirebaseFirestore.getInstance().collection("Messages").add(newMessage);
+                            }
                             for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
                                 Message m = documentSnapshot.toObject(Message.class);
                                 Message newMessage = new Message(messages[0], timestamp);
