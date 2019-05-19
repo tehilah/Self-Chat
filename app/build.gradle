@@ -36,4 +36,5 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:4.2.1'
     implementation 'com.firebaseui:firebase-ui-firestore:4.2.1'
     implementation 'com.firebaseui:firebase-ui-database:4.3.2'
+    implementation 'com.jaredrummler:android-device-names:1.1.8'
 }

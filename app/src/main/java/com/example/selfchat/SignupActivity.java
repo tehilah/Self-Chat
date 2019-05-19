@@ -16,7 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Login extends AppCompatActivity {
+public class SignupActivity extends AppCompatActivity {
     private Button setNameButton;
     private EditText editText;
     private Intent intent;
@@ -24,9 +24,9 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        intent = new Intent(Login.this, MainActivity.class);
+        intent = new Intent(SignupActivity.this, MainActivity.class);
         intent.putExtra("IsFirstRun", false);
-        setNameButton = (Button)findViewById(R.id.submit_name);
+        setNameButton = (Button)findViewById(R.id.btnSignup);
         editText = (EditText) findViewById(R.id.editText);
         checkForEnteredName();
         configureSkip();

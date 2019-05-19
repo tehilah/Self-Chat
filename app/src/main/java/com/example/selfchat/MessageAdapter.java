@@ -1,21 +1,20 @@
 package com.example.selfchat;
 
 
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
-import com.google.firebase.firestore.DocumentReference;
-
+import com.google.firebase.firestore.DocumentSnapshot;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
 public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAdapter.MessageHolder> {
     private MessageAdapter.OnItemClickListener mListener;
+
 
     /**
      * Create a new RecyclerView adapter that listens to a Firestore Query.  See
@@ -30,6 +29,7 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
     @Override
     protected void onBindViewHolder(@NonNull MessageHolder messageHolder, int position, @NonNull Message message) {
         messageHolder.message.setText(message.getMessage());
+
     }
 
     @NonNull
@@ -47,30 +47,16 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
         super.onDataChanged();
     }
 
-    public void deleteItem(int position){
-        new DeleteMessageAsyncTask().execute(getSnapshots().getSnapshot(position).getReference());
-    }
-
-    /**
-     * Asynchronous class for deleting messages
-     */
-    private static class DeleteMessageAsyncTask extends AsyncTask<DocumentReference, Void, Void> {
-        @Override
-        protected Void doInBackground(DocumentReference... references) {
-            references[0].delete();
-            return null;
-        }
-    }
 
     public interface OnItemClickListener{
-        void onItemClick(int position);
+        void onItemClick(DocumentSnapshot ds, int position);
     }
 
     public void setOnItemClickListener(MessageAdapter.OnItemClickListener listener){
         mListener = listener;
     }
 
-    public class MessageHolder extends RecyclerView.ViewHolder{
+    class MessageHolder extends RecyclerView.ViewHolder{
         // here we add items that appear in each view holder
         TextView message;
 
@@ -83,8 +69,8 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
                 public boolean onLongClick(View v) {
                     if (mListener != null){
                         int position = getAdapterPosition();
-                        if (position != RecyclerView.NO_POSITION){
-                            mListener.onItemClick(position);
+                        if (position != RecyclerView.NO_POSITION && mListener != null){
+                            mListener.onItemClick(getSnapshots().getSnapshot(position), position);
                         }
                     }
                     return true;

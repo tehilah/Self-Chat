@@ -1,18 +1,14 @@
 package com.example.selfchat;
 
 
-import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.DialogInterface;
+
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -40,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
     */
     public static final String EMPTY_MESSAGE = "";
     public static final String ERROR_MESSAGE = "Woops! you can't send an empty message";
-    public static final String CONFIRM_DELETE = "Are you sure you want to delete?";
-    final Context context = this;
+    public static final String DOCUMENT_REF_PATH = "document reference path";
+    public static final String TIMESTAMP = "timestamp";
 
     /*
     variables
@@ -58,44 +54,46 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-//        checkIfLoggedIn();
         setContentView(R.layout.activity_main);
-        initRecyclerView();
         i = getIntent();
-        chatText = findViewById(R.id.editText);
         username = (TextView) findViewById(R.id.user_name);
+        chatText = findViewById(R.id.editText);
+//        checkIfLoggedIn();
+        initRecyclerView();
         ListenForDelete();
 
     }
 
+    /**
+     * check if the user has instantiated his name, if so stay on main screen. if not navigate
+     * to login page
+     */
     private void checkIfLoggedIn() {
-
-        executor.execute(new Runnable() {
-            @Override
-            public void run() {
-            db.collection("Default").document("User").get()
+        if (i.getStringExtra("name") != null) {
+            username.setText("Hello " + i.getStringExtra("name"));
+        }
+        else {
+            executor.execute(new Runnable() {
+                @Override
+                public void run() {
+                    db.collection("Default").document("User").get()
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                    @Override
-                    public void onSuccess(DocumentSnapshot documentSnapshot) {
-                        if (getIntent().getBooleanExtra("IsFirstRun", true)) {
-                            if (documentSnapshot.get("name") == null) {
-                                startActivity(new Intent(MainActivity.this, Login.class));
-                            } else {
-                                String name = documentSnapshot.get("name").toString();
-                                i.putExtra("name", name);
-                                username.setText("Hello " + name);
+                        @Override
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            if (getIntent().getBooleanExtra("IsFirstRun", true)) {
+                                if (documentSnapshot.get("name") == null) {
+                                    startActivity(new Intent(MainActivity.this, SignupActivity.class));
+                                } else {
+                                    String name = documentSnapshot.get("name").toString();
+                                    i.putExtra("name", name);
+                                    username.setText("Hello " + name);
+                                }
                             }
-                        } else {
-                            if (i.getStringExtra("name") != null) {
-                                username.setText("Hello " + i.getStringExtra("name"));
-                            }
-
                         }
-
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        }
 
     }
 
@@ -132,27 +130,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void ListenForDelete() {
-        mAdapter.setOnItemClickListener(new MessageAdapter.OnItemClickListener(){
+        mAdapter.setOnItemClickListener(new MessageAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(final int position) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                alertDialogBuilder
-                        .setMessage(CONFIRM_DELETE)
-                        .setCancelable(false)
-                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // if this button is clicked, delete message asychronously
-                                mAdapter.deleteItem(position);
-                            }
-                        }).setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        // if this button is clicked, just close the dialog box and do nothing
-                        dialog.cancel();
-                    }
-                });
+            public void onItemClick(DocumentSnapshot ds, int position) {
+                Message m = ds.toObject(Message.class);
+                if(m != null){
+                    Intent intent = new Intent(MainActivity.this, MessageDetailsActivity.class);
+                    intent.putExtra(TIMESTAMP, m.getTimestamp());
+                    intent.putExtra(DOCUMENT_REF_PATH, ds.getReference().getPath());
+                    startActivity(intent);
+                }
 
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
             }
         });
     }
@@ -176,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         mAdapter = new MessageAdapter(options);
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(mAdapter);
     }
