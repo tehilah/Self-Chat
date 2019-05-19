@@ -3,18 +3,15 @@ package com.example.selfchat;
 
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
-
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -23,9 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -51,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private MessageAdapter mAdapter;
     private CollectionReference messageRef = db.collection("Messages");
     private ExecutorService executor = Executors.newCachedThreadPool();
-    private TextView username;
     private Intent i;
     private TextView toolbarText;
 
@@ -61,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         i = getIntent();
-        username = (TextView) findViewById(R.id.user_name);
         chatText = findViewById(R.id.editText);
         initToolbar();
         checkIfLoggedIn();
@@ -99,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                             if (getIntent().getBooleanExtra("IsFirstRun", true)) {
                                 if (documentSnapshot.get("name") == null) {
                                     startActivity(new Intent(MainActivity.this, SignupActivity.class));
+                                    finish();
                                 } else {
                                     String name = documentSnapshot.get("name").toString();
                                     i.putExtra("name", name);
