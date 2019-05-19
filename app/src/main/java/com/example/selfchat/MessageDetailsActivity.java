@@ -46,7 +46,9 @@ public class MessageDetailsActivity extends AppCompatActivity {
         String docRefPath = intent.getStringExtra("document reference path");
         DocumentReference messageRef = db.document(docRefPath);
         new DeleteMessageAsyncTask().execute(messageRef);
-        startActivity(new Intent(MessageDetailsActivity.this, MainActivity.class));
+        Intent i = new Intent(MessageDetailsActivity.this, MainActivity.class);
+        i.putExtra("IsFirstRun", false);
+        startActivity(i);
         finish();
     }
 

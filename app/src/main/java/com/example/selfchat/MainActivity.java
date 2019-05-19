@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
+
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
@@ -21,6 +23,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private ExecutorService executor = Executors.newCachedThreadPool();
     private TextView username;
     private Intent i;
+    private TextView toolbarText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,21 +63,32 @@ public class MainActivity extends AppCompatActivity {
         i = getIntent();
         username = (TextView) findViewById(R.id.user_name);
         chatText = findViewById(R.id.editText);
-//        checkIfLoggedIn();
+        initToolbar();
+        checkIfLoggedIn();
         initRecyclerView();
         ListenForDelete();
-
     }
 
+    private void initToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbarText = toolbar.findViewById(R.id.toolbarText);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
+
+    private void updateUI(final TextView textView, final String message){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textView.setText(message);
+            }
+        });
+    }
     /**
      * check if the user has instantiated his name, if so stay on main screen. if not navigate
      * to login page
      */
     private void checkIfLoggedIn() {
-        if (i.getStringExtra("name") != null) {
-            username.setText("Hello " + i.getStringExtra("name"));
-        }
-        else {
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -86,7 +102,12 @@ public class MainActivity extends AppCompatActivity {
                                 } else {
                                     String name = documentSnapshot.get("name").toString();
                                     i.putExtra("name", name);
-                                    username.setText("Hello " + name);
+                                    updateUI(toolbarText, "Hello " + i.getStringExtra("name") + "!");
+                                }
+                            }
+                            else{
+                                if (i.getStringExtra("name") != null) {
+                                    updateUI(toolbarText, "Hello " + i.getStringExtra("name") + "!");
                                 }
                             }
                         }
@@ -94,8 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
-    }
 
     private void addMessageToFireStore(final String message){
         executor.execute(new Runnable() {
@@ -124,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
 
-                chatText.setText(EMPTY_MESSAGE);
+                updateUI(chatText, EMPTY_MESSAGE);
             }
         });
     }

@@ -42,7 +42,7 @@
         android:id="@+id/sub_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="210dp"
+        android:layout_marginTop="242dp"
         android:text="Please enter your name"
         android:textSize="20sp"
         app:layout_constraintHorizontal_bias="0.763"

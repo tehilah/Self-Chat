@@ -4,33 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/detailsbackground2"
+    android:background="@drawable/detailsbackground"
     tools:context=".MessageDetailsActivity">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Message Details:"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textStyle="bold"
-        android:textSize="30sp"
-        android:layout_marginTop="12dp"
         android:layout_marginLeft="12dp"
-        android:textColor="#6F1C1C"/>
+        android:layout_marginTop="12dp"
+        android:text="Message Details:"
+        android:textColor="@android:color/holo_purple"
+        android:textSize="50sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/timestamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Time sent:"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
-        android:textSize="20sp"
         android:layout_marginTop="12dp"
-        android:layout_marginStart="12dp"
-        android:textColor="#524242"/>
+        android:layout_marginLeft="12dp"
+        android:text="Time sent:"
+        android:textColor="#524242"
+        android:textSize="22sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
         android:id="@+id/timestamp_result"
@@ -48,13 +47,13 @@
         android:id="@+id/device_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Device name:"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/timestamp"
-        android:textSize="20sp"
         android:layout_marginTop="12dp"
-        android:layout_marginStart="12dp"
-        android:textColor="#524242"/>
+        android:layout_marginLeft="12dp"
+        android:text="Device name:"
+        android:textColor="#524242"
+        android:textSize="22sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/timestamp" />
 
     <TextView
         android:id="@+id/device_result"
@@ -64,7 +63,7 @@
         app:layout_constraintLeft_toRightOf="@id/device_type"
         app:layout_constraintTop_toBottomOf="@id/timestamp_result"
         android:textSize="20sp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="17dp"
         android:layout_marginLeft="15dp"
         />
 
@@ -72,15 +71,14 @@
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="PERMANENT DELETE"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/device_type"
-        android:onClick="deleteMessage"
         android:layout_marginTop="12dp"
         android:background="@drawable/round_corners"
+        android:onClick="deleteMessage"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
-        android:textColor="#6F1C1C"
-         />
+        android:text="PERMANENT DELETE"
+        android:textColor="@android:color/holo_purple"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/device_type" />
 </androidx.constraintlayout.widget.ConstraintLayout>
