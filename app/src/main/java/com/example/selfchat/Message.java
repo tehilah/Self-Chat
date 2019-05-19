@@ -24,6 +24,9 @@ public class Message {
         this.id = id;
     }
 
+    public void setTimestamp(String t){
+        timestamp = t;
+    }
 
 
     /*
@@ -37,4 +40,7 @@ public class Message {
         return message;
     }
 
+    public String getTimestamp() {
+        return timestamp;
+    }
 }

@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.google.firebase.firestore.DocumentReference;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,16 +48,16 @@ public class MessageAdapter extends FirestoreRecyclerAdapter<Message, MessageAda
     }
 
     public void deleteItem(int position){
-        new DeleteMessageAsyncTask().execute(position);
+        new DeleteMessageAsyncTask().execute(getSnapshots().getSnapshot(position).getReference());
     }
 
     /**
      * Asynchronous class for deleting messages
      */
-    private class DeleteMessageAsyncTask extends AsyncTask<Integer, Void, Void> {
+    private static class DeleteMessageAsyncTask extends AsyncTask<DocumentReference, Void, Void> {
         @Override
-        protected Void doInBackground(Integer... positions) {
-            getSnapshots().getSnapshot(positions[0]).getReference().delete();
+        protected Void doInBackground(DocumentReference... references) {
+            references[0].delete();
             return null;
         }
     }

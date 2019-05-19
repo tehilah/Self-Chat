@@ -5,24 +5,33 @@ import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import java.lang.ref.WeakReference;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     */
     public static final String EMPTY_MESSAGE = "";
     public static final String ERROR_MESSAGE = "Woops! you can't send an empty message";
-    public static final String LIST_SIZE = "ListSize";
     public static final String CONFIRM_DELETE = "Are you sure you want to delete?";
     final Context context = this;
 
@@ -42,16 +50,88 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private MessageAdapter mAdapter;
     private CollectionReference messageRef = db.collection("Messages");
+    private ExecutorService executor = Executors.newCachedThreadPool();
+    private TextView username;
+    private Intent i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+//        checkIfLoggedIn();
         setContentView(R.layout.activity_main);
-
         initRecyclerView();
+        i = getIntent();
         chatText = findViewById(R.id.editText);
+        username = (TextView) findViewById(R.id.user_name);
+        ListenForDelete();
 
+    }
+
+    private void checkIfLoggedIn() {
+
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+            db.collection("Default").document("User").get()
+                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (getIntent().getBooleanExtra("IsFirstRun", true)) {
+                            if (documentSnapshot.get("name") == null) {
+                                startActivity(new Intent(MainActivity.this, Login.class));
+                            } else {
+                                String name = documentSnapshot.get("name").toString();
+                                i.putExtra("name", name);
+                                username.setText("Hello " + name);
+                            }
+                        } else {
+                            if (i.getStringExtra("name") != null) {
+                                username.setText("Hello " + i.getStringExtra("name"));
+                            }
+
+                        }
+
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void addMessageToFireStore(final String message){
+        executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                // get timestamp
+                SimpleDateFormat s = new SimpleDateFormat("dd-MM-YYYY, hh:mm:ss", Locale.getDefault());
+                s.setTimeZone(TimeZone.getTimeZone("GMT+3"));
+                final String timestamp = s.format(new Date());
+
+                // find the next free id and add message to db
+                messageRef.orderBy("id", Query.Direction.DESCENDING).limit(1).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                if(queryDocumentSnapshots.isEmpty()){
+                                    Message newMessage = new Message(message, timestamp);
+                                    FirebaseFirestore.getInstance().collection("Messages").add(newMessage);
+                                }
+                                for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
+                                    Message m = documentSnapshot.toObject(Message.class);
+                                    Message newMessage = new Message(message, timestamp);
+                                    newMessage.setId(m.getId()+1);
+                                    messageRef.add(newMessage);
+                                }
+                            }
+                        });
+
+                chatText.setText(EMPTY_MESSAGE);
+            }
+        });
+    }
+
+    private void ListenForDelete() {
         mAdapter.setOnItemClickListener(new MessageAdapter.OnItemClickListener(){
             @Override
             public void onItemClick(final int position) {
@@ -84,16 +164,13 @@ public class MainActivity extends AppCompatActivity {
     public void sendMessage(View v){
         String message = chatText.getText().toString();
         if (message.trim().isEmpty()){ toastEmptyMessage(); }
-        else{
-            InsertMessageAsyncTask task = new InsertMessageAsyncTask(this);
-            task.execute(message);
-        }
+        else{ addMessageToFireStore(message); }
     }
     /**
      * Initializes the RecyclerView
      */
     private void initRecyclerView(){
-        Query q = messageRef.orderBy("timestamp", Query.Direction.ASCENDING);
+        Query q = messageRef.orderBy("id", Query.Direction.ASCENDING);
         FirestoreRecyclerOptions<Message> options = new FirestoreRecyclerOptions.Builder<Message>()
                 .setQuery(q, Message.class)
                 .build();
@@ -122,50 +199,5 @@ public class MainActivity extends AppCompatActivity {
         Toast toast = Toast.makeText(context, ERROR_MESSAGE, duration);
         toast.show();
     }
-
-    /**
-     * Asynchronous class for adding message to db
-     */
-    private static class InsertMessageAsyncTask extends AsyncTask<String, Void, Void> {
-        private WeakReference<MainActivity> activityWeakReference;
-
-        private InsertMessageAsyncTask(MainActivity activity){
-            activityWeakReference = new WeakReference<>(activity);
-        }
-        @Override
-        protected Void doInBackground(final String... messages) {
-            MainActivity activity = activityWeakReference.get();
-            if(activity == null || activity.isFinishing()){
-                return null;
-            }
-
-            // get timestamp
-            SimpleDateFormat s = new SimpleDateFormat("dd-MM-YYYY, hh:mm:ss");
-            s.setTimeZone(TimeZone.getTimeZone("GMT+3"));
-            final String timestamp = s.format(new Date());
-
-            // find the next free id and add message to db
-            activity.messageRef.orderBy("id", Query.Direction.DESCENDING).limit(1).get()
-                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                        @Override
-                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                            if(queryDocumentSnapshots.isEmpty()){
-                                Message newMessage = new Message(messages[0], timestamp);
-                                FirebaseFirestore.getInstance().collection("Messages").add(newMessage);
-                            }
-                            for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
-                                Message m = documentSnapshot.toObject(Message.class);
-                                Message newMessage = new Message(messages[0], timestamp);
-                                newMessage.setId(m.getId()+1);
-                                FirebaseFirestore.getInstance().collection("Messages").add(newMessage);
-                            }
-                        }
-                    });
-
-            activity.chatText.setText(EMPTY_MESSAGE);
-            return null;
-        }
-    }
-
 
 }
