@@ -1,21 +1,16 @@
 package com.example.selfchat;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jaredrummler.android.device.DeviceName;
 
 public class MessageDetailsActivity extends AppCompatActivity {
     private Intent intent;
-    private TextView textViewTimestamp;
-    private TextView textViewDeviceName;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -27,19 +22,11 @@ public class MessageDetailsActivity extends AppCompatActivity {
     }
 
     private void initializePage() {
-        textViewTimestamp = findViewById(R.id.timestamp_result);
-        textViewDeviceName = findViewById(R.id.device_result);
+        TextView textViewTimestamp = findViewById(R.id.timestamp_result);
+        TextView textViewDeviceName = findViewById(R.id.device_result);
 
-        String timestamp = intent.getStringExtra("timestamp");
-        textViewTimestamp.setText(timestamp);
-
-        DeviceName.with(this).request(new DeviceName.Callback() {
-            @Override
-            public void onFinished(DeviceName.DeviceInfo info, Exception error) {
-                String deviceName = info.marketName;
-                textViewDeviceName.setText(deviceName);
-            }
-        });
+        textViewTimestamp.setText(intent.getStringExtra("timestamp"));
+        textViewDeviceName.setText(intent.getStringExtra("phone sender"));
     }
 
     public void deleteMessage(View v) {

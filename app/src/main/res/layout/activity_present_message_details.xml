@@ -57,10 +57,11 @@
 
     <TextView
         android:id="@+id/device_result"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Galaxy s+8"
+        android:text="Galaxy s+8 sdk google android"
         app:layout_constraintLeft_toRightOf="@id/device_type"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timestamp_result"
         android:textSize="20sp"
         android:layout_marginTop="17dp"
@@ -80,5 +81,5 @@
         android:textColor="@android:color/holo_purple"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/device_type" />
+        app:layout_constraintTop_toBottomOf="@id/device_result" />
 </androidx.constraintlayout.widget.ConstraintLayout>

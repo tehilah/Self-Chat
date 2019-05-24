@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String ERROR_MESSAGE = "Woops! you can't send an empty message";
     public static final String DOCUMENT_REF_PATH = "document reference path";
     public static final String TIMESTAMP = "timestamp";
+    public static final String PHONE_SENDER = "phone sender";
 
     /*
     variables
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 SimpleDateFormat s = new SimpleDateFormat("dd-MM-YYYY, hh:mm:ss", Locale.getDefault());
                 s.setTimeZone(TimeZone.getTimeZone("GMT+3"));
                 final String timestamp = s.format(new Date());
-
+                final String phoneSender = getPhoneSender();
                 // find the next free id and add message to db
                 messageRef.orderBy("id", Query.Direction.DESCENDING).limit(1).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
                                     Message m = documentSnapshot.toObject(Message.class);
                                     Message newMessage = new Message(message, timestamp);
                                     newMessage.setId(m.getId()+1);
+                                    newMessage.setPhoneSender(phoneSender);
                                     messageRef.add(newMessage);
                                 }
                             }
@@ -149,6 +151,7 @@ public class MainActivity extends AppCompatActivity {
                 if(m != null){
                     Intent intent = new Intent(MainActivity.this, MessageDetailsActivity.class);
                     intent.putExtra(TIMESTAMP, m.getTimestamp());
+                    intent.putExtra(PHONE_SENDER, m.getPhoneSender());
                     intent.putExtra(DOCUMENT_REF_PATH, ds.getReference().getPath());
                     startActivity(intent);
                 }
@@ -199,4 +202,9 @@ public class MainActivity extends AppCompatActivity {
         toast.show();
     }
 
+    private String getPhoneSender(){
+        String manufacturer = android.os.Build.MANUFACTURER;
+        String model = android.os.Build.MODEL;
+        return manufacturer + " " + model;
+    }
 }

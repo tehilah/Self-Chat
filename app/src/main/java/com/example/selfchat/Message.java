@@ -9,6 +9,7 @@ public class Message {
     private int id;
     private String message;
     private String timestamp;
+    private String phoneSender;
 
     public Message(){}
 
@@ -28,6 +29,10 @@ public class Message {
         timestamp = t;
     }
 
+    public void setPhoneSender(String phone){
+        phoneSender = phone;
+    }
+
 
     /*
     getters
@@ -43,4 +48,9 @@ public class Message {
     public String getTimestamp() {
         return timestamp;
     }
+
+    public String getPhoneSender() {
+        return phoneSender;
+    }
+
 }
